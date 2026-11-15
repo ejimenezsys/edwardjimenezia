@@ -1,4 +1,567 @@
-// 1. Interactive PassportAI Semantic Router + Executive Prompt Lab
+/* ==========================================================================
+   1. 3D Z-AXIS TUNNEL & EYE-PORTAL ENGINE WITH HIGH-CONTRAST NEON WARP RAYS
+   ========================================================================== */
+const EYE_ORIGIN = [0.5297, 0.2464];
+const QS_START_Z = -10500;
+const XS_END_Z = 760;
+
+const CHAPTER_LEAD = 0.08;
+const CHAPTER_WEIGHTS = (() => {
+  const raw = Array.from({ length: 7 }, (_, a) => Math.pow(0.92, a));
+  const sum = raw.reduce((s, a) => s + a, 0);
+  return raw.map(s => s * (1 - CHAPTER_LEAD) / sum);
+})();
+const CHAPTER_STARTS = CHAPTER_WEIGHTS.reduce((acc, _, idx) => {
+  acc.push(idx ? acc[idx - 1] + CHAPTER_WEIGHTS[idx - 1] : CHAPTER_LEAD);
+  return acc;
+}, []);
+
+function clamp01(n) {
+  return n < 0 ? 0 : n > 1 ? 1 : n;
+}
+
+function mapRange(val, inArr, outArr) {
+  if (val <= inArr[0]) return outArr[0];
+  const last = inArr.length - 1;
+  if (val >= inArr[last]) return outArr[last];
+  for (let i = 1; i <= last; i++) {
+    if (val <= inArr[i]) {
+      const t = (val - inArr[i - 1]) / (inArr[i] - inArr[i - 1] || 1);
+      return outArr[i - 1] + t * (outArr[i] - outArr[i - 1]);
+    }
+  }
+  return outArr[last];
+}
+
+function getActiveChapterIndex(qProg) {
+  let bestIdx = 0;
+  let bestDist = Infinity;
+  for (let a = 0; a < 6; a++) {
+    const d = Math.abs(qProg - (CHAPTER_STARTS[a] + CHAPTER_WEIGHTS[a] * 0.65));
+    if (d < bestDist) {
+      bestDist = d;
+      bestIdx = a;
+    }
+  }
+  return bestIdx;
+}
+
+function scrollToTunnelPhase(normProgress) {
+  const track = document.getElementById('cine-track');
+  if (!track) return;
+  const trackTop = track.getBoundingClientRect().top + window.scrollY;
+  const scrollable = Math.max(1, track.offsetHeight - window.innerHeight);
+  window.scrollTo({
+    top: trackTop + clamp01(normProgress) * scrollable,
+    behavior: 'smooth'
+  });
+}
+window.scrollToTunnelPhase = scrollToTunnelPhase;
+
+function scrollToChapter(chapterIdx) {
+  const idx = Math.max(0, Math.min(5, chapterIdx));
+  const f = CHAPTER_STARTS[idx];
+  const h = f + CHAPTER_WEIGHTS[idx] + CHAPTER_WEIGHTS[idx + 1];
+  const qTarget = f + (h - f) * 0.48;
+  const overallTarget = 0.34 + qTarget * (0.96 - 0.34);
+  scrollToTunnelPhase(overallTarget);
+}
+window.scrollToChapter = scrollToChapter;
+
+function initCineTunnel() {
+  const track = document.getElementById('cine-track');
+  const sticky = document.getElementById('cine-sticky');
+  if (!track || !sticky) return;
+
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) return;
+
+  const globalScrollLine = document.getElementById('global-scroll-line');
+  const heroCapas = document.getElementById('hero-capas');
+  const heroBokeh = document.getElementById('hero-bokeh');
+  const heroPartWrap = document.getElementById('hero-particulas-wrap');
+  const heroFigura = document.getElementById('hero-figura');
+  const heroFiguraZoom = document.getElementById('hero-figura-zoom');
+  const heroReticle = document.getElementById('hero-eye-reticle');
+  const heroVelo = document.getElementById('hero-velo');
+  const heroTunel = document.getElementById('hero-tunel');
+  const heroTitulos = document.getElementById('hero-titulos');
+  const heroTitulosBlur = document.getElementById('hero-titulos-blur');
+  const heroCredenciales = document.getElementById('hero-credenciales');
+
+  const warpWrap = document.getElementById('cine-particulas-wrap');
+  const vueloOrigen = document.getElementById('vuelo-origen');
+  const vueloCifras = document.getElementById('vuelo-cifras');
+  const counterNodes = vueloCifras ? Array.from(vueloCifras.querySelectorAll('b[data-counter-target]')) : [];
+  const ascensoMetodo = document.getElementById('ascenso-metodo');
+
+  const capaEscape = document.getElementById('cine-capa-escape');
+  const journeyIntro = document.getElementById('journey-intro');
+  const chapterEls = Array.from(document.querySelectorAll('.journey-chapter')).map(el => ({
+    root: el,
+    copy: el.querySelector('.journey-copy'),
+    letter: el.querySelector('.journey-letter'),
+    visual: el.querySelector('.journey-visual')
+  }));
+  const journeySalida = document.getElementById('journey-salida');
+  const stepBtns = Array.from(document.querySelectorAll('#journey-step-list .journey-step-btn'));
+  const journeyProgBar = document.getElementById('journey-progress-bar');
+  const journeyHint = document.getElementById('journey-scroll-hint');
+
+  const cineCromo = document.getElementById('cine-cromo');
+  const cineVelVal = document.getElementById('cine-vel-val');
+  const cineBarraFill = document.getElementById('cine-barra-fill');
+
+  let isMobile = window.matchMedia('(max-width: 940px)').matches;
+  window.matchMedia('(max-width: 940px)').addEventListener('change', e => {
+    isMobile = e.matches;
+    measureEyeTransform();
+  });
+
+  const eyeMetrics = { ox: '52.97%', oy: '24.64%', k: 16.5, dx: 0, dy: 0 };
+  function measureEyeTransform() {
+    if (!heroFigura || !sticky) return;
+    const figW = heroFigura.offsetWidth;
+    const figH = heroFigura.offsetHeight;
+    const stW = sticky.clientWidth;
+    const stH = sticky.clientHeight;
+    if (!figW || !figH || !stW || !stH) return;
+
+    const eyeX = heroFigura.offsetLeft + EYE_ORIGIN[0] * figW;
+    const eyeY = heroFigura.offsetTop + EYE_ORIGIN[1] * figH;
+
+    eyeMetrics.ox = (EYE_ORIGIN[0] * figW).toFixed(1) + 'px';
+    eyeMetrics.oy = (EYE_ORIGIN[1] * figH).toFixed(1) + 'px';
+    eyeMetrics.k = isMobile ? 13.5 : 17.5;
+    eyeMetrics.dx = stW / 2 - eyeX;
+    eyeMetrics.dy = stH / 2 - eyeY;
+
+    if (heroFiguraZoom) {
+      heroFiguraZoom.style.transformOrigin = `${eyeMetrics.ox} ${eyeMetrics.oy}`;
+    }
+  }
+  measureEyeTransform();
+  const ro = new ResizeObserver(measureEyeTransform);
+  if (heroFigura) ro.observe(heroFigura);
+  ro.observe(sticky);
+
+  let mouseX = 0;
+  let mouseY = 0;
+  window.addEventListener('pointermove', e => {
+    if (isMobile) return;
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+  }, { passive: true });
+
+  let targetProgress = 0;
+  let smoothProgress = 0;
+  let velocity = 0;
+  let currentActiveChap = -1;
+  const warpProgressRef = { current: 0 };
+
+  function computeRawProgress() {
+    const rect = track.getBoundingClientRect();
+    const scrollable = Math.max(1, track.offsetHeight - window.innerHeight);
+    targetProgress = clamp01(-rect.top / scrollable);
+
+    if (globalScrollLine) {
+      const docMax = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      globalScrollLine.style.height = (clamp01(window.scrollY / docMax) * 100).toFixed(1) + '%';
+    }
+  }
+  computeRawProgress();
+  window.addEventListener('scroll', computeRawProgress, { passive: true });
+  window.addEventListener('resize', computeRawProgress, { passive: true });
+
+  function applyTunnelFrame(O) {
+    const K = clamp01(O / 0.34);
+    const Zn = 0.055;
+    const an = 0.58;
+
+    const bokehScale = mapRange(K, [0, an], [1.04, 1.34]);
+    const bokehOp = mapRange(K, [0, Zn, 0.45], [1, 1, 0]);
+    const veloOp = mapRange(K, [0, 0.16, 0.38], [1, 1, 0]);
+    const tunelOp = mapRange(K, [0.18, 0.42, an + 0.04, an + 0.16], [0, 1, 1, 0]);
+    const partOp = mapRange(K, [0, 0.06, 0.26, 0.45], [0.75, 1, 0.85, 0]);
+
+    const zoomLinear = clamp01((K - Zn) / (an - Zn));
+    const zoomScale = 1 + (eyeMetrics.k - 1) * Math.pow(zoomLinear, 2.5);
+    const zoomDx = eyeMetrics.dx * Math.pow(zoomLinear, 1.55);
+    const zoomDy = eyeMetrics.dy * Math.pow(zoomLinear, 1.55);
+    const figOp = mapRange(K, [an - 0.08, an + 0.02], [1, 0]);
+    const heroCapasOp = mapRange(O, [0.22, 0.26], [1, 0]);
+
+    const parallaxFade = mapRange(K, [0, Zn * 1.4], [1, 0]);
+    const px = mouseX * 8 * parallaxFade;
+    const py = mouseY * 5 * parallaxFade;
+
+    if (heroCapas) heroCapas.style.opacity = heroCapasOp.toFixed(3);
+    if (heroBokeh) {
+      heroBokeh.style.opacity = bokehOp.toFixed(3);
+      heroBokeh.style.transform = `translate3d(${(mouseX * -14).toFixed(1)}px, ${(mouseY * -9).toFixed(1)}px, 0) scale(${bokehScale.toFixed(3)})`;
+    }
+    if (heroPartWrap) heroPartWrap.style.opacity = partOp.toFixed(3);
+    if (heroVelo) heroVelo.style.opacity = veloOp.toFixed(3);
+    if (heroTunel) heroTunel.style.opacity = tunelOp.toFixed(3);
+
+    if (heroFigura) {
+      heroFigura.style.opacity = figOp.toFixed(3);
+      heroFigura.style.transform = `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0)`;
+    }
+    if (heroFiguraZoom) {
+      heroFiguraZoom.style.transform = `translate3d(${zoomDx.toFixed(1)}px, ${zoomDy.toFixed(1)}px, 0) scale(${zoomScale.toFixed(3)})`;
+    }
+    if (heroReticle) {
+      const retOp = mapRange(zoomLinear, [0, 0.08, 0.42, 0.65], [0.85, 1, 0.9, 0]);
+      heroReticle.style.opacity = retOp.toFixed(3);
+    }
+
+    const titOp = mapRange(K, [0, 0.03, 0.15, 0.25], [1, 1, 1, 0]);
+    const titY = mapRange(K, [0, 0.28], [0, -48]);
+    const titBlurOp = mapRange(K, [0.16, 0.21, 0.27], [0, 0.55, 0]);
+    if (heroTitulos) {
+      heroTitulos.style.opacity = titOp.toFixed(3);
+      heroTitulos.style.transform = isMobile
+        ? `translate3d(0, ${titY.toFixed(1)}px, 0)`
+        : `translate3d(0, calc(-50% + ${titY.toFixed(1)}px), 0)`;
+      heroTitulos.style.pointerEvents = titOp > 0.25 ? 'auto' : 'none';
+    }
+    if (heroTitulosBlur) {
+      heroTitulosBlur.style.opacity = titBlurOp.toFixed(3);
+      heroTitulosBlur.style.transform = isMobile
+        ? `translate3d(0, ${titY.toFixed(1)}px, 0)`
+        : `translate3d(0, calc(-50% + ${titY.toFixed(1)}px), 0)`;
+    }
+    if (heroCredenciales) heroCredenciales.style.opacity = titOp.toFixed(3);
+
+    const origenWin = [0.50, 0.56, 0.72, 0.78];
+    const cifrasWin = [0.56, 0.62, 0.78, 0.84];
+    const metodoWin = [0.83, 0.88, 0.96, 1.0];
+
+    const origenOp = mapRange(K, origenWin, [0, 1, 1, 0]);
+    const origenY = mapRange(K, [origenWin[0], origenWin[3]], [26, -26]);
+    if (vueloOrigen) {
+      vueloOrigen.style.opacity = origenOp.toFixed(3);
+      vueloOrigen.style.transform = `translate3d(0, ${origenY.toFixed(1)}px, 0)`;
+    }
+
+    const cifrasOp = mapRange(K, cifrasWin, [0, 1, 1, 0]);
+    const cifrasY = mapRange(K, [cifrasWin[0], cifrasWin[3]], [28, -28]);
+    if (vueloCifras) {
+      vueloCifras.style.opacity = cifrasOp.toFixed(3);
+      vueloCifras.style.transform = `translate3d(0, ${cifrasY.toFixed(1)}px, 0)`;
+    }
+
+    if (cifrasOp > 0.01 && counterNodes.length) {
+      const cProg = clamp01((K - cifrasWin[0]) / (cifrasWin[2] - cifrasWin[0]));
+      const eased = 1 - Math.pow(1 - cProg, 2.4);
+      counterNodes.forEach(node => {
+        const target = parseInt(node.getAttribute('data-counter-target') || '0', 10);
+        const prefix = node.getAttribute('data-prefix') || '';
+        const suffix = node.getAttribute('data-suffix') || '';
+        node.textContent = prefix + Math.round(target * eased) + suffix;
+      });
+    }
+
+    const metodoOp = mapRange(K, metodoWin, [0, 1, 1, 0]);
+    const metodoY = mapRange(K, [metodoWin[0], metodoWin[3]], [30, -30]);
+    if (ascensoMetodo) {
+      ascensoMetodo.style.opacity = metodoOp.toFixed(3);
+      ascensoMetodo.style.transform = `translate3d(0, ${metodoY.toFixed(1)}px, 0)`;
+    }
+
+    // Phase 3: 6-Chapter 3D Z-Axis Tunnel + Luminous Warp Rays (visible right from the start!)
+    const q = clamp01((O - 0.34) / (0.96 - 0.34));
+    warpProgressRef.current = clamp01(O / 0.96);
+
+    // Keep warp rays visible right from Hero (0.42) up to full intensity (1.0) inside the tunnel!
+    const warpOp = mapRange(O, [0.0, 0.08, 0.16, 0.94, 0.995], [0.42, 0.78, 1.0, 1.0, 0]);
+    if (warpWrap) warpWrap.style.opacity = warpOp.toFixed(3);
+
+    const escapeLayerOp = mapRange(O, [0.325, 0.345, 0.965, 0.992], [0, 1, 1, 0]);
+    if (capaEscape) {
+      capaEscape.style.opacity = escapeLayerOp.toFixed(3);
+      capaEscape.style.pointerEvents = escapeLayerOp > 0.2 ? 'auto' : 'none';
+    }
+
+    const introOp = mapRange(q, [0.0, 0.06, 0.12], [1, 1, 0]);
+    if (journeyIntro) journeyIntro.style.opacity = introOp.toFixed(3);
+
+    chapterEls.forEach((ch, r) => {
+      const f = CHAPTER_STARTS[r];
+      const h = f + CHAPTER_WEIGHTS[r] + CHAPTER_WEIGHTS[r + 1];
+      const m = QS_START_Z - r * 1200;
+      const y = XS_END_Z + r * 220;
+      const v = clamp01((q - f) / (h - f));
+
+      const zPos = mapRange(v, [0, 0.17, 0.30, 0.37, 0.62, 0.70, 0.84, 1], [m, m * 0.52, -1500, 0, 60, 320, 620, y]);
+      const op = mapRange(v, [0, 0.12, 0.20, 0.34, 0.64, 0.76, 0.86], [0, 0, 0.34, 1, 1, 0.3, 0]);
+      const blurVal = mapRange(v, [0, 0.30, 0.37, 0.62, 0.72, 1], [10, 4, 0, 0, 5.5, 12]);
+      const splitL = clamp01((v - 0.62) / (1 - 0.62));
+
+      ch.root.style.opacity = op.toFixed(3);
+      if (op <= 0.005) {
+        ch.root.style.visibility = 'hidden';
+        return;
+      }
+      ch.root.style.visibility = 'visible';
+      ch.root.style.transform = `translate3d(0px, 0px, ${zPos.toFixed(1)}px)`;
+
+      const copyX = isMobile ? '0vw' : (-splitL * 74).toFixed(2) + 'vw';
+      const copyY = isMobile ? (-splitL * 30).toFixed(2) + 'vh' : '0vh';
+      const visX = isMobile ? '0vw' : (splitL * 70).toFixed(2) + 'vw';
+      const visY = isMobile ? (splitL * 34).toFixed(2) + 'vh' : '0vh';
+
+      const copyBlur = blurVal * 0.6 < 0.1 ? 'none' : `blur(${(blurVal * 0.6).toFixed(2)}px)`;
+      const visBlur = blurVal < 0.06 ? 'none' : `blur(${blurVal.toFixed(2)}px)`;
+
+      if (ch.copy) {
+        ch.copy.style.transform = `translate3d(${copyX}, ${copyY}, -70px)`;
+        ch.copy.style.filter = copyBlur;
+      }
+      if (ch.visual) {
+        ch.visual.style.transform = `translate3d(${visX}, ${visY}, 150px)`;
+        ch.visual.style.filter = visBlur;
+      }
+      if (ch.letter) {
+        const clipPct = mapRange(v, [0.18, 0.40], [100, 0]);
+        ch.letter.style.clipPath = `inset(0 0 0 ${clipPct.toFixed(1)}%)`;
+      }
+    });
+
+    const salidaOp = mapRange(q, [0.92, 0.96], [0, 1]);
+    const salidaY = mapRange(q, [0.92, 0.98], [26, 0]);
+    if (journeySalida) {
+      journeySalida.style.opacity = salidaOp.toFixed(3);
+      journeySalida.style.transform = `translate3d(0, calc(-50% + ${salidaY.toFixed(1)}px), 0)`;
+      journeySalida.style.pointerEvents = salidaOp > 0.4 ? 'auto' : 'none';
+    }
+
+    const activeChap = getActiveChapterIndex(q);
+    if (activeChap !== currentActiveChap) {
+      currentActiveChap = activeChap;
+      stepBtns.forEach((btn, idx) => {
+        btn.classList.toggle('is-active', idx === activeChap);
+      });
+    }
+    if (journeyProgBar) {
+      journeyProgBar.style.width = (q * 100).toFixed(1) + '%';
+    }
+    if (journeyHint) {
+      journeyHint.style.opacity = mapRange(q, [0.08, 0.20], [1, 0]).toFixed(2);
+    }
+
+    const cromoOp = mapRange(O, [0.005, 0.025, 0.965, 0.998], [0, 1, 1, 0]);
+    if (cineCromo) cineCromo.style.opacity = cromoOp.toFixed(3);
+    if (cineBarraFill) cineBarraFill.style.transform = `scaleX(${O.toFixed(4)})`;
+    if (cineVelVal) {
+      const velNum = 1 + clamp01(O / 0.94) * 9.0;
+      cineVelVal.textContent = velNum.toFixed(1);
+    }
+  }
+
+  let lastTime = performance.now();
+  function tickSpring(now) {
+    const dt = Math.min(0.04, (now - lastTime) / 1000);
+    lastTime = now;
+
+    const stiffness = 85;
+    const damping = 26;
+    const mass = 0.25;
+    const force = -stiffness * (smoothProgress - targetProgress) - damping * velocity;
+    const accel = force / mass;
+    velocity += accel * dt;
+    smoothProgress += velocity * dt;
+
+    if (Math.abs(targetProgress - smoothProgress) < 0.00005 && Math.abs(velocity) < 0.00005) {
+      smoothProgress = targetProgress;
+      velocity = 0;
+    }
+
+    applyTunnelFrame(clamp01(smoothProgress));
+    requestAnimationFrame(tickSpring);
+  }
+  requestAnimationFrame(tickSpring);
+
+  initHeroParticlesCanvas(isMobile);
+  initWarpParticlesCanvas(warpProgressRef, isMobile);
+}
+
+/* ---------------- Floating Hero Neural Particles Canvas ---------------- */
+function initHeroParticlesCanvas(isMobile) {
+  const canvas = document.getElementById('hero-particulas-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const count = isMobile ? 42 : 76;
+
+  const palettes = ['0, 240, 255', '240, 211, 162', '168, 85, 247'];
+  const spawn = () => ({
+    x: Math.random(),
+    y: Math.random(),
+    r: Math.random() * 2.5 + 0.9,
+    vx: (Math.random() - 0.5) * 0.014,
+    vy: -(Math.random() * 0.018 + 0.005),
+    a: Math.random() * 0.55 + 0.35,
+    f: Math.random() * Math.PI * 2,
+    capa: Math.random() < 0.35 ? 0.65 : 1.15,
+    rgb: palettes[Math.floor(Math.random() * palettes.length)]
+  });
+
+  const particles = Array.from({ length: count }, spawn);
+
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(r.width * dpr));
+    canvas.height = Math.max(1, Math.round(r.height * dpr));
+  }
+  resize();
+  new ResizeObserver(resize).observe(canvas);
+
+  let prev = performance.now();
+  function draw(now) {
+    const dt = Math.min(0.05, (now - prev) / 1000);
+    prev = now;
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+
+    for (const p of particles) {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.f += dt * 1.25;
+      if (p.y < -0.05) {
+        Object.assign(p, spawn(), { y: 1.05 });
+      }
+      const alpha = p.a * (0.65 + 0.35 * Math.sin(p.f));
+      const rad = p.r * dpr * p.capa;
+      const gx = p.x * W;
+      const gy = p.y * H;
+      const grad = ctx.createRadialGradient(gx, gy, 0, gx, gy, rad * 4.5);
+      grad.addColorStop(0, `rgba(255, 255, 255, ${(alpha * 0.95).toFixed(3)})`);
+      grad.addColorStop(0.28, `rgba(${p.rgb}, ${(alpha * 0.88).toFixed(3)})`);
+      grad.addColorStop(1, `rgba(${p.rgb}, 0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(gx, gy, rad * 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+
+/* ---------------- High-Contrast Luminous Warp Rays Canvas ---------------- */
+function initWarpParticlesCanvas(progressRef, isMobile) {
+  const canvas = document.getElementById('cine-warp-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const count = isMobile ? 110 : 220;
+
+  // Bright Neon Cyan, Royal Gold, and Electric Violet so rays NEVER get lost on dark backgrounds
+  const rayColors = [
+    { main: '0, 240, 255', tip: '224, 252, 255' },   // Electric Cyan
+    { main: '240, 211, 162', tip: '255, 248, 225' }, // Royal Gold
+    { main: '56, 189, 248', tip: '224, 242, 254' },  // Sky Laser Blue
+    { main: '192, 132, 252', tip: '243, 232, 255' }  // Neon Violet
+  ];
+
+  const spawn = () => {
+    const R = Math.random();
+    const colorObj = rayColors[Math.floor(Math.random() * rayColors.length)];
+    return {
+      a: Math.random() * Math.PI * 2,
+      r: Math.random() * 0.22 + 0.015,
+      v: 0.38 + R * 1.45,
+      b: 0.65 + R * 0.35,
+      capa: 0.4 + R * 0.85,
+      color: colorObj
+    };
+  };
+
+  const streaks = Array.from({ length: count }, spawn);
+
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(r.width * dpr));
+    canvas.height = Math.max(1, Math.round(r.height * dpr));
+  }
+  resize();
+  new ResizeObserver(resize).observe(canvas);
+
+  let prev = performance.now();
+  function draw(now) {
+    const dt = Math.min(0.05, (now - prev) / 1000);
+    prev = now;
+    const V = clamp01(progressRef.current);
+    const P = 0.12 + V * 0.38;
+    const A = clamp01((V - 0.75) / 0.25);
+
+    const W = canvas.width;
+    const H = canvas.height;
+    const cx = W / 2;
+    const cy = H * 0.5;
+    const maxR = Math.hypot(W, H) / 2;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.lineCap = 'round';
+
+    // Subtle central radial energy core so the tunnel center glows
+    const coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.45);
+    coreGrad.addColorStop(0, `rgba(0, 240, 255, ${(0.08 + V * 0.12).toFixed(3)})`);
+    coreGrad.addColorStop(0.45, `rgba(210, 174, 119, ${(0.04 + V * 0.06).toFixed(3)})`);
+    coreGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = coreGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    for (const s of streaks) {
+      s.r += dt * P * s.v * (1 + A * 3.2);
+      if (s.r > 1.25) {
+        Object.assign(s, spawn());
+      }
+      // Longer, more dramatic light-speed ray tails
+      const tailLen = (0.032 + V * 0.095 + A * 0.18) * (0.45 + s.capa);
+      const r0 = Math.max(0, s.r - tailLen);
+      const x0 = cx + Math.cos(s.a) * r0 * maxR;
+      const y0 = cy + Math.sin(s.a) * r0 * maxR;
+      const x1 = cx + Math.cos(s.a) * s.r * maxR;
+      const y1 = cy + Math.sin(s.a) * s.r * maxR;
+
+      const fade = Math.min(1, s.r * 3.8) * (1 - clamp01((s.r - 0.96) / 0.28));
+      const alpha = Math.min(1, fade * s.b * (0.78 + V * 0.22));
+
+      // Draw outer neon glow trail
+      const lineGrad = ctx.createLinearGradient(x0, y0, x1, y1);
+      lineGrad.addColorStop(0, `rgba(${s.color.main}, 0)`);
+      lineGrad.addColorStop(0.6, `rgba(${s.color.main}, ${(alpha * 0.75).toFixed(3)})`);
+      lineGrad.addColorStop(1, `rgba(${s.color.tip}, ${alpha.toFixed(3)})`);
+
+      ctx.strokeStyle = lineGrad;
+      ctx.lineWidth = (1.2 + s.capa * 2.4 + A * 1.1) * dpr;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+
+      // Draw bright laser head at (x1, y1)
+      ctx.fillStyle = `rgba(${s.color.tip}, ${(alpha * 0.95).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(x1, y1, (1.1 + s.capa * 1.3) * dpr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initCineTunnel();
+});
+
+// 2. Interactive PassportAI Semantic Router + Executive Prompt Lab
 const missions = {
   closer: {
     model: 'Claude 4.6 Sonnet + Semantic Router',
@@ -129,7 +692,7 @@ if (copyPromptBtn && routerPromptText) {
   });
 }
 
-// 2. Interactive Digital Employees ROI Calculator
+// 3. Interactive Digital Employees ROI Calculator
 const roiLeads = document.getElementById('roiLeads');
 const roiTicket = document.getElementById('roiTicket');
 const roiDelay = document.getElementById('roiDelay');
@@ -144,7 +707,6 @@ const updateRoiCalculator = () => {
   document.getElementById('roiTicketLabel').textContent = `$${ticket.toLocaleString('es-US')} USD`;
   document.getElementById('roiDelayLabel').textContent = `${delay} minutos`;
 
-  // Conversion lift factor based on response time reduction to <15s
   const delayFactor = Math.min(0.09, 0.02 + (delay / 240) * 0.07);
   const extraDeals = Math.max(1, Math.round(leads * delayFactor));
   const recoveredMoney = extraDeals * ticket;
@@ -158,7 +720,7 @@ const updateRoiCalculator = () => {
   if (el) el.addEventListener('input', updateRoiCalculator);
 });
 
-// 3. Interactive 4 Intelligences Validator
+// 4. Interactive 4 Intelligences Validator
 const sliders = ['valFin', 'valEmo', 'valEst', 'valIa'];
 const updateValidator = () => {
   const vals = sliders.map((id) => {
@@ -192,7 +754,7 @@ sliders.forEach((id) => {
   if (el) el.addEventListener('input', updateValidator);
 });
 
-// 4. Excerpt Dialog with mandatory light-dismiss fallback (per modern-web-guidance `light-dismiss-a-dialog`)
+// 5. Excerpt Dialog with mandatory light-dismiss fallback (per modern-web-guidance `light-dismiss-a-dialog`)
 const excerptDialog = document.getElementById('excerptDialog');
 const openExcerptBtn = document.getElementById('openExcerptBtn');
 if (openExcerptBtn && excerptDialog) {
