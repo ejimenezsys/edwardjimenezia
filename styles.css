@@ -560,15 +560,15 @@ a {
   margin-right: 10px;
 }
 
-/* CAPA 3: CANVAS WARP PARTICLES (Z-INDEX 3 + SCREEN BLEND PARA BRILLO MÁXIMO SOBRE NEGRO) */
+/* CAPA 3: CANVAS WARP PARTICLES (Z-INDEX 3 + SCREEN BLEND EQUILIBRADO) */
 .cine-particulas-capa {
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  opacity: 0.35;
+  opacity: 0.18;
   mix-blend-mode: screen;
-  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.55));
+  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.35));
   will-change: opacity;
 }
 
